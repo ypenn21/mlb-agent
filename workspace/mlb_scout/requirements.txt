@@ -1,0 +1,9 @@
+google-adk==1.12.*
+google-cloud-aiplatform>=1.110.0,<2.0
+google-cloud-bigquery>=3.36.0,<4.0
+pandas>=2.3.2,<3.0
+requests==2.32.*
+mcp>=1.13.1,<2.0
+streamlit==1.41.*
+python-dotenv==1.0.*
+toolbox-core==0.4.*

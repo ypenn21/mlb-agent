@@ -1,0 +1,92 @@
+sources:
+  mlb_bigquery:
+    kind: bigquery
+    project: qwiklabs-gcp-00-f50d2e52f41f
+    location: us-central1
+
+tools:
+  # Data discovery tools
+  list_datasets:
+    kind: bigquery-list-dataset-ids
+    source: mlb_bigquery
+    description: Use this tool to list all the dataset IDs from the source.
+
+  list_tables:
+    kind: bigquery-list-table-ids
+    source: mlb_bigquery
+    description: Use this tool to list the table IDs in a given dataset.
+
+  get_dataset_info:
+    kind: bigquery-get-dataset-info
+    source: mlb_bigquery
+    description: Use this tool to get metadata for a dataset.
+
+  get_table_info:
+    kind: bigquery-get-table-info
+    source: mlb_bigquery
+    description: Use this tool to get metadata for a table.
+
+  # Query execution tools
+  run_sql:
+    kind: bigquery-execute-sql
+    source: mlb_bigquery
+    description: |
+      Use this tool to execute arbitrary SQL statements.
+
+  hot_teams:
+    kind: bigquery-sql
+    source: mlb_bigquery
+    statement: |
+      SELECT team_name, last_10_win_pct, last_10_wins, last_10_games
+      FROM `mlb_analytics.momentum_metrics`
+      ORDER BY last_10_win_pct DESC
+      LIMIT 5
+    description: Use this tool to get the 5 hottest teams based on last 10 games
+
+  predict_matchup:
+    kind: bigquery-sql
+    source: mlb_bigquery
+    statement: |
+      SELECT * FROM `mlb_analytics.predict_game`
+      WHERE LOWER(home_team_name) LIKE CONCAT('%', LOWER(@home_team), '%')
+      AND LOWER(away_team_name) LIKE CONCAT('%', LOWER(@away_team), '%')
+      LIMIT 1
+    parameters:
+      - name: home_team
+        type: string
+        description: Full name of the home team
+      - name: away_team
+        type: string
+        description: Full name of the away team
+    description: |
+      Use this tool to predict game outcome between two teams. 
+      Takes a home team and away team name as parameters. Verify you have the exact (full) team names before using this tool.
+      If the user doesn't specify which team is playing at home, assume it's the first one passed to you
+
+      Example:
+      {{
+        "home_team": "Texas Rangers",
+        "away_team": "Houston Astros"
+      }}
+
+
+  team_pressure_performance:
+    kind: bigquery-sql
+    source: mlb_bigquery
+    statement: |
+      SELECT team_name, close_games, close_wins, close_game_win_pct
+      FROM `mlb_analytics.pressure_performance`
+      ORDER BY close_game_win_pct DESC
+      LIMIT 10
+    description: Get the top 10 teams by performance in close games
+
+toolsets:
+  bq_toolset:
+    - list_datasets
+    - list_tables
+    - get_dataset_info
+    - get_table_info
+    - run_sql
+    - hot_teams
+    - predict_matchup
+    - team_pressure_performance
